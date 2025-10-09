@@ -6,5 +6,4 @@ const hashPassword = async (password) => {
     console.log('Хеш пароля:', hashedPassword);
 };
 
-// Замените 'your_password_here' на пароль, который нужно хешировать
 hashPassword('mirek_admin');
