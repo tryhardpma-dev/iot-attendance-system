@@ -51,7 +51,7 @@ const StudentSettings = ({ student, onClose, onDelete, onTogglePresence }) => {
                     <strong>ISIC čislo:</strong> {student.isic}
                 </p>
 
-                {/* Выпадающий список для изменения присутствия */}
+                
                 <div style={{ marginTop: "24px" }}>
                     <label style={{ marginBottom: "8px", display: "block", fontWeight: "bold" }}>
                         Status:
@@ -74,12 +74,11 @@ const StudentSettings = ({ student, onClose, onDelete, onTogglePresence }) => {
                     </select>
                 </div>
 
-                {/* Кнопка удаления */}
                 <div style={{marginTop: "24px", textAlign: "right"}}>
                     <button
                         onClick={() => {
                             onDelete(student.id);
-                            onClose(); // Закрытие окна после удаления
+                            onClose(); 
                         }}
                         style={{
                             padding: "8px 16px",

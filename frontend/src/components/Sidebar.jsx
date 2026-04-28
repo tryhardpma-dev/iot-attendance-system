@@ -3,13 +3,13 @@ import { Link, useNavigate } from "react-router-dom";
 import IoT from "../images/iot.svg";
 
 const Sidebar = ({ onLogout }) => {
-    const [activeItem, setActiveItem] = useState(null); // Хранит текущий активный элемент
+    const [activeItem, setActiveItem] = useState(null);
     const navigate = useNavigate();
 
     const handleLogout = () => {
         if (window.confirm("Вы уверены, что хотите выйти?")) {
-            onLogout(); // Вызов переданного метода выхода
-            navigate("/auth"); // Перенаправление на страницу авторизации
+            onLogout(); 
+            navigate("/auth"); 
         }
     };
 
@@ -34,7 +34,7 @@ const Sidebar = ({ onLogout }) => {
                 justifyContent: "space-between",
             }}
         >
-            {/* Верхняя часть */}
+            {}
             <div>
                 <Link to="/" onClick={() => setActiveItem(null)} style={{ textDecoration: "none" }}>
                     <h1
@@ -67,7 +67,7 @@ const Sidebar = ({ onLogout }) => {
                         <li key={item.id} style={{ marginBottom: "16px" }}>
                             <Link
                                 to={item.path}
-                                onClick={() => setActiveItem(item.id)} // Устанавливаем активный элемент
+                                onClick={() => setActiveItem(item.id)} 
                                 style={{
                                     display: "flex",
                                     alignItems: "center",
@@ -118,7 +118,7 @@ const Sidebar = ({ onLogout }) => {
                 </ul>
             </div>
 
-            {/* Кнопка "Выход" */}
+            {}
             <button
                 onClick={handleLogout}
                 style={{

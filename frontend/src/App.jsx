@@ -7,12 +7,12 @@ import AuthForm from "./pages/AuthForm.jsx";
 
 const App = () => {
     const [isAuthenticated, setIsAuthenticated] = useState(() => {
-        return Boolean(localStorage.getItem("authToken")); // Проверяем наличие токена при загрузке
+        return Boolean(localStorage.getItem("authToken")); 
     });
 
     const handleLogout = () => {
-        setIsAuthenticated(false); // Устанавливаем состояние аутентификации в false
-        localStorage.removeItem("authToken"); // Удаляем токен из localStorage
+        setIsAuthenticated(false); 
+        localStorage.removeItem("authToken"); 
     };
 
     return (
@@ -32,16 +32,16 @@ const MainContent = ({ onLogout, isAuthenticated, setIsAuthenticated }) => {
 
     return (
         <div style={{ display: "flex" }}>
-            {shouldShowSidebar && <Sidebar onLogout={onLogout} />} {/* Передаем onLogout в Sidebar */}
+            {shouldShowSidebar && <Sidebar onLogout={onLogout} />} 
             <div style={{ flex: 1, padding: "24px", marginLeft: shouldShowSidebar ? "250px" : "0" }}>
                 <Routes>
-                    {/* Страница авторизации */}
+                    
                     <Route path="/auth" element={<AuthForm setIsAuthenticated={setIsAuthenticated} />} />
 
-                    {/* Главная страница */}
+                    
                     <Route path="/" element={<HomePage />} />
 
-                    {/* Защищенная страница IoT */}
+                    
                     <Route
                         path="/iot"
                         element={

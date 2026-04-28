@@ -11,7 +11,7 @@ const AddStudentForm = ({ onClose, onSubmit }) => {
         padding: "8px",
         border: "1px solid #ccc",
         borderRadius: "8px",
-        boxSizing: "border-box", // Устранение асимметрии
+        boxSizing: "border-box", 
     };
 
     const handleSubmit = (e) => {
@@ -87,7 +87,7 @@ const AddStudentForm = ({ onClose, onSubmit }) => {
                             onChange={(e) => setName(e.target.value)}
                             style={{
                                 ...inputStyle,
-                                borderColor: errors.name ? "red" : "#ccc", // Визуализация ошибки
+                                borderColor: errors.name ? "red" : "#ccc", 
                             }}
                             placeholder="Zadajte meno"
                         />
@@ -109,7 +109,7 @@ const AddStudentForm = ({ onClose, onSubmit }) => {
                             onChange={(e) => setSurname(e.target.value)}
                             style={{
                                 ...inputStyle,
-                                borderColor: errors.surname ? "red" : "#ccc", // Визуализация ошибки
+                                borderColor: errors.surname ? "red" : "#ccc", 
                             }}
                             placeholder="Zadajte priezvisko"
                         />
@@ -131,7 +131,7 @@ const AddStudentForm = ({ onClose, onSubmit }) => {
                             onChange={(e) => setIsic(e.target.value)}
                             style={{
                                 ...inputStyle,
-                                borderColor: errors.isic ? "red" : "#ccc", // Визуализация ошибки
+                                borderColor: errors.isic ? "red" : "#ccc", 
                             }}
                             placeholder="Zadajte ISIC"
                         />

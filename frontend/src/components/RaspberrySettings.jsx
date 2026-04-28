@@ -9,7 +9,7 @@ const mqttOptions = {
     username: 'maker',
     password: 'mother.mqtt.password',
 };
-const client = mqtt.connect(mqttBrokerUrl,mqttOptions); // Замените на ваш MQTT-брокер
+const client = mqtt.connect(mqttBrokerUrl,mqttOptions); 
 
 const RaspberrySettings = ({ initialData = {}, onClose }) => {
     const [mqttClientId, setMqttClientId] = useState(initialData?.mqtt?.client_id || "");
@@ -27,7 +27,7 @@ const RaspberrySettings = ({ initialData = {}, onClose }) => {
 
     const sendUpdatedData = (updatedFields) => {
         if (client.connected) {
-            console.log("Отправка данных в MQTT:", {
+            console.log("Sending data to MQTT:", {
                 topic: TOPIC,
                 payload: JSON.stringify(updatedFields),
                 qos: 2,
@@ -35,22 +35,22 @@ const RaspberrySettings = ({ initialData = {}, onClose }) => {
             });
 
             client.publish(
-                TOPIC, // Топик
-                JSON.stringify(updatedFields), // Сообщение
+                TOPIC, 
+                JSON.stringify(updatedFields), 
                 {
-                    qos: 2, // Уровень QoS
-                    retain: true, // Retained-флаг
+                    qos: 2, // level of delivery guarantee = 2
+                    retain: true, // Retained-message
                 },
                 (err) => {
                     if (err) {
-                        console.error("❌ Ошибка отправки данных в MQTT:", err);
+                        console.error("Error sending data to MQTT:", err);
                     } else {
-                        console.log("✅ Данные успешно отправлены!");
+                        console.log("Data sent successfully!");
                     }
                 }
             );
         } else {
-            console.error("❌ Подключение к MQTT отсутствует");
+            console.error("❌ Connection to MQTT is missing");
         }
     };
 
@@ -59,7 +59,6 @@ const RaspberrySettings = ({ initialData = {}, onClose }) => {
     const handleSaveSettings = () => {
         const updatedData = {};
 
-        // Проверяем и добавляем поля MQTT
         if (mqttClientId && mqttClientId !== initialData.mqtt?.client_id) {
             updatedData.mqtt = { ...updatedData.mqtt, client_id: mqttClientId };
         }
@@ -76,7 +75,6 @@ const RaspberrySettings = ({ initialData = {}, onClose }) => {
             updatedData.mqtt = { ...updatedData.mqtt, user: mqttUser };
         }
 
-        // Проверяем и добавляем поля Wi-Fi
         if (wifiSSID && wifiSSID !== initialData.wifi?.ssid) {
             updatedData.wifi = { ...updatedData.wifi, ssid: wifiSSID };
         }
@@ -84,7 +82,6 @@ const RaspberrySettings = ({ initialData = {}, onClose }) => {
             updatedData.wifi = { ...updatedData.wifi, key: wifiKey };
         }
 
-        // Проверяем и добавляем другие поля
         if (ntpHost && ntpHost !== initialData.ntpHost) {
             updatedData.ntpHost = ntpHost;
         }
@@ -95,10 +92,9 @@ const RaspberrySettings = ({ initialData = {}, onClose }) => {
             updatedData.SLEEP_DURATION = Number(sleepDuration);
         }
 
-        // Лог для проверки
-        console.log("Измененные данные для отправки:", updatedData);
+      
+        console.log("Updated data to send:", updatedData);
 
-        // Отправляем только измененные данные
         sendUpdatedData(updatedData);
     };
 

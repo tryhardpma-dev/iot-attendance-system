@@ -1,9 +1,9 @@
 import bcrypt from 'bcrypt';
 
 const hashPassword = async (password) => {
-    const saltRounds = 10; // Количество раундов соли
+    const saltRounds = 10; 
     const hashedPassword = await bcrypt.hash(password, saltRounds);
-    console.log('Хеш пароля:', hashedPassword);
+    return hashedPassword;
 };
 
 hashPassword('mirek_admin');

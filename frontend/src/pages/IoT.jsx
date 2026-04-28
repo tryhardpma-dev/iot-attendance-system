@@ -20,16 +20,15 @@ const IoTPage = () => {
     const [hoveredCourse, setHoveredCourse] = useState(null);
     const [isModalOpenCviko, setIsModalOpenCviko] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [courses, setCourses] = useState([]); // Курсы (загрузка с сервера)
-    const [students, setStudents] = useState([]); // Студенты (загрузка с сервера)
+    const [courses, setCourses] = useState([]); 
+    const [students, setStudents] = useState([]); 
     const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
     const [selectedStudent, setSelectedStudent] = useState(null);
 
     const handleToggleAttendance = async (studentIsic, weekNumber, attended) => {
         try {
-            await updateAttendance(studentIsic, weekNumber, attended); // Обновляем на сервере
+            await updateAttendance(studentIsic, weekNumber, attended); 
 
-            // Обновляем локальное состояние
             setAttendance((prev) => ({
                 ...prev,
                 [studentIsic]: prev[studentIsic].map((week) =>
@@ -39,37 +38,37 @@ const IoTPage = () => {
                 ),
             }));
         } catch (error) {
-            console.error("Ошибка обновления посещаемости:", error.message);
+            console.error("Error updating attendance:", error.message);
         }
     };
 
 
     const fetchAttendance = async (isic) => {
         try {
-            console.log('Идентификатор студента для API:', isic);
+            console.log('Student ID for API:', isic);
             const response = await updateAttendanceByStudentId(isic);
             console.log('Response:', response.data);
-            return response.data; // Массив с посещаемостью по неделям
+            return response.data; // 
         } catch (error) {
-            console.error('Ошибка получения данных о посещаемости:', error.message);
+            console.error('Error fetching attendance data:', error.message);
         }
     };
 
     useEffect(() => {
         const loadAttendanceData = async () => {
             if (!students || students.length === 0) {
-                console.log('Нет студентов для загрузки посещаемости');
+                console.log('No students to load attendance data for. Waiting for students to be loaded...');
                 return;
             }
 
             const attendanceData = {};
             for (const student of students) {
-                console.log(`Загрузка посещаемости для студента: ${student.isic}`);
+                console.log(`Loading attendance data for student: ${student.isic}`);
                 const studentAttendance = await fetchAttendance(student.isic);
-                console.log(`Данные для студента ${student.id}:`, studentAttendance);
+                console.log(`Data for student ${student.id}:`, studentAttendance);
                 attendanceData[student.isic] = studentAttendance;
             }
-            console.log('Все данные о посещаемости:', attendanceData);
+            console.log('All attendance data:', attendanceData);
             setAttendance(attendanceData);
         };
 
@@ -82,11 +81,11 @@ const IoTPage = () => {
     const handleSubmitRaspberrySettings = async (config) => {
         try {
             const response = await axios.post("http://localhost:3000/raspberry-config", config);
-            alert("Конфигурация успешно отправлена!");
-            console.log("Отправленная конфигурация:", config);
+            alert("Configuration successfully sent!");
+            console.log("Sent configuration:", config);
         } catch (error) {
-            console.error("Ошибка при отправке конфигурации:", error);
-            alert("Не удалось отправить конфигурацию.");
+            console.error("Error sending configuration:", error);
+            alert("Failed to send configuration.");
         }
     };
 
@@ -99,7 +98,7 @@ const IoTPage = () => {
             )
             const formattedStudents = response.data.map((student) => ({
                 id: student.id,
-                name: `${student.first_name} ${student.last_name}`, // Объединяем имя и фамилию
+                name: `${student.first_name} ${student.last_name}`, 
                 isic: student.isic,
                 present: student.present,
                 cviky_id: student.cviky_id,
@@ -108,32 +107,32 @@ const IoTPage = () => {
             setStudents(formattedStudents);
 
         } catch (error) {
-            console.error('Ошибка при получении студентов:', error);
+            console.error('Error fetching students:', error);
         }
     };
 
     useEffect(() => {
-        if (!selectedTimeSlot) return; // Если пара не выбрана, ничего не делаем
+        if (!selectedTimeSlot) return; 
 
         // Запуск пинга каждые 5 секунд
         const intervalId = setInterval(() => {
-            console.log(`Пинг для обновления студентов пары с ID: ${selectedTimeSlot.id}`);
+            console.log(`Pinging for updating students for time slot with ID: ${selectedTimeSlot.id}`);
             fetchStudents(selectedTimeSlot.id);
         }, 10000);
 
-        return () => clearInterval(intervalId); // Очищаем интервал при размонтировании компонента или изменении выбранной пары
+        return () => clearInterval(intervalId); 
     }, [selectedTimeSlot]);
 
 
     const handleDeleteAllStudents = async (cvikyId) => {
         try {
             await deleteAllStudents(cvikyId);
-            alert(`Všetci študenti pre cvičenie "${selectedTimeSlot.name}" su vymazane.`);
+            alert(`All students for the session "${selectedTimeSlot.name}" have been deleted.`);
 
             const loadedStudents = await getStudents();
             const formattedStudents = loadedStudents.map((student) => ({
                 id: student.id,
-                name: `${student.first_name} ${student.last_name}`, // Объединяем имя и фамилию
+                name: `${student.first_name} ${student.last_name}`, 
                 isic: student.isic,
                 present: student.present,
                 cviky_id: student.cviky_id,
@@ -141,26 +140,24 @@ const IoTPage = () => {
 
             setStudents(formattedStudents);
         } catch (error) {
-            console.error("Chyba vymazania študentov:", error.message);
-            alert("Nepodarilo sa vymazať študentov.");
+            console.error("Error deleting students:", error.message);
+            alert("Failed to delete students.");
         }
     };
 
     const handleAddCviky = async (cvikyData) => {
         if (!cvikyData || !cvikyData.day_name || !cvikyData.time_start || !cvikyData.time_end) {
-            alert("Prosim, vyplňte všetky polia pre pridanie cvičenia!");
+            alert("Please, fill in all fields for adding a session!");
             return;
         }
 
         try {
-            // Добавляем новую пару через API
             await addPair({
                 day_name: cvikyData.day_name,
                 time_start: cvikyData.time_start,
                 time_end: cvikyData.time_end,
             });
 
-            // Загружаем обновленные данные с сервера
             const loadedCourses = await getCviky();
             const formattedCourses = loadedCourses.map((course) => ({
                 id: course.id,
@@ -168,36 +165,35 @@ const IoTPage = () => {
                 timeSlots: [`${course.day_name}: ${course.time_start} - ${course.time_end}`],
             }));
 
-            // Обновляем состояние курсов
             setCourses(formattedCourses);
 
-            console.log("Cvičenie úspešne pridané.");
+            console.log("Session successfully added.");
         } catch (error) {
-            console.error("Chyba pridania cvika:", error.message);
-            alert("Nepodarilo sa pridať cvičenie. Skúste to znova.");
+            console.error("Error adding session:", error.message);
+            alert("Failed to add session. Please try again.");
         }
     };
 
     const handleDeleteCourse = async (courseId) => {
-        if (window.confirm("Действительно хотите удалить пару из списка?")) {
+        if (window.confirm("Are you sure you want to delete this session from the list?")) {
             try {
-                await deletePair(courseId); // API-запрос для удаления
+                await deletePair(courseId); 
                 setCourses((prevCourses) => prevCourses.filter((course) => course.id !== courseId));
-                console.log(`Пара с ID ${courseId} успешно удалена.`);
+                console.log(`Session with ID ${courseId} successfully deleted.`);
             } catch (error) {
-                console.error("Ошибка при удалении пары:", error.message);
-                alert("Не удалось удалить пару. Попробуйте снова.");
+                console.error("Error deleting session:", error.message);
+                alert("Failed to delete session. Please try again.");
             }
         }
     };
 
     const handleDeleteStudent = async (id) => {
         try {
-            await deleteStudent(id); // Удаляем студента на сервере
+            await deleteStudent(id); 
             const loadedStudents = await getStudents();
             const formattedStudents = loadedStudents.map((student) => ({
                 id: student.id,
-                name: `${student.first_name} ${student.last_name}`, // Объединяем имя и фамилию
+                name: `${student.first_name} ${student.last_name}`, 
                 isic: student.isic,
                 present: student.present,
                 cviky_id: student.cviky_id,
@@ -205,28 +201,29 @@ const IoTPage = () => {
 
             setStudents(formattedStudents);
         } catch (error) {
-            console.error("Ошибка удаления студента:", error.message);
+            console.error("Error deleting student:", error.message);
+            alert("Failed to delete student.");
         }
     };
 
     const handleAddStudent = async (studentData) => {
         if (!selectedTimeSlot) {
-            alert("Prosim,zvoľte miestnosť(čas)!");
+            alert("Please, select a room(time)!");
             return;
         }
 
         try {
             await addStudentToCviky({
                 isic: studentData.isic,
-                first_name: studentData.name, // Передаем отдельно имя
-                last_name: studentData.surname, // Передаем отдельно фамилию
+                first_name: studentData.name, 
+                last_name: studentData.surname, 
                 cviky_id: selectedTimeSlot.id,
                 present: false,
             });
             const loadedStudents = await getStudents();
             const formattedStudents = loadedStudents.map((student) => ({
                 id: student.id,
-                name: `${student.first_name} ${student.last_name}`, // Объединяем имя и фамилию
+                name: `${student.first_name} ${student.last_name}`, 
                 isic: student.isic,
                 present: student.present,
                 cviky_id: student.cviky_id,
@@ -234,25 +231,26 @@ const IoTPage = () => {
 
             setStudents(formattedStudents);
         } catch (error) {
-            console.error("Chyba pridania študenta:", error.message);
+            console.error("Error adding student:", error.message);
+            alert("Failed to add student.");
         }
     };
 
 
     useEffect(() => {
-        console.log("Курсы:", courses);
-        console.log("Студенты:", students);
+        console.log("Courses:", courses);
+        console.log("Students:", students);
     }, [courses, students]);
 
-    // Загрузка курсов и студентов с сервера
+    
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const loadedCourses = await getCviky(); // Загрузка пар с сервера
-                const loadedStudents = await getStudents(); // Загрузка студентов с сервера
+                const loadedCourses = await getCviky(); 
+                const loadedStudents = await getStudents(); 
 
-                console.log("Загруженные курсы с сервера:", loadedCourses);
-                console.log("Загруженные студенты с сервера:", loadedStudents);
+                console.log("Loaded courses from server:", loadedCourses);
+                console.log("Loaded students from server:", loadedStudents);
 
                 const formattedCourses = loadedCourses.map((course) => ({
                     id: course.id,
@@ -260,10 +258,9 @@ const IoTPage = () => {
                     timeSlots: [`${course.day_name}: ${course.time_start} - ${course.time_end}`],
                 }));
 
-                // Форматирование студентов: объединяем имя и фамилию в одну строку
                 const formattedStudents = loadedStudents.map((student) => ({
                     id: student.id,
-                    name: `${student.first_name} ${student.last_name}`, // Объединяем имя и фамилию
+                    name: `${student.first_name} ${student.last_name}`, 
                     isic: student.isic,
                     present: student.present,
                     cviky_id: student.cviky_id,
@@ -272,7 +269,7 @@ const IoTPage = () => {
                 setCourses(formattedCourses);
                 setStudents(formattedStudents);
             } catch (error) {
-                console.error("Chyba:", error.message);
+                console.error("Error fetching data:", error.message);
             }
         };
 
@@ -302,10 +299,10 @@ const IoTPage = () => {
                         cursor: "pointer",
                         display: "flex",
                         alignItems: "center",
-                        gap: "8px", // Расстояние между текстом и иконкой
+                        gap: "8px", 
                     }}
                 >
-                    {/* Иконка шестеренки */}
+                   
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 24 24"
@@ -330,7 +327,7 @@ const IoTPage = () => {
                 />
             )}
 
-            {/* Модальное окно для добавления студента */}
+           
             {isModalOpen && (
                 <AddStudentForm
                     onClose={() => setIsModalOpen(false)}
@@ -362,7 +359,7 @@ const IoTPage = () => {
                 </button>
             </div>
 
-            {/* Список пар */}
+           
             <div style={{display: "flex", flexWrap: "wrap", gap: "8px"}}>
                 {courses.map((course) => (
                     <div
@@ -374,7 +371,7 @@ const IoTPage = () => {
                         onMouseEnter={() => setHoveredCourse(course.id)}
                         onMouseLeave={() => setHoveredCourse(null)}
                     >
-                        {/* Кнопка удаления (крестик) */}
+                       
                         {hoveredCourse === course.id && (
                             <button
                                 onClick={() => handleDeleteCourse(course.id)}
@@ -400,7 +397,7 @@ const IoTPage = () => {
                             </button>
                         )}
 
-                        {/* Кнопка выбора пары */}
+                    
                         <button
                             onClick={() => setSelectedTimeSlot(course)}
                             style={{
@@ -476,7 +473,6 @@ const IoTPage = () => {
                                         <span>{student.name}</span>
                                     </div>
 
-                                    {/* Правая часть: Недельная посещаемость */}
                                     <div style={{display: "flex", gap: "13px"}}>
                                         {Array(13)
                                             .fill(null)
@@ -491,16 +487,15 @@ const IoTPage = () => {
                                                         key={weekIndex}
                                                         onClick={() =>
                                                             handleToggleAttendance(student.isic, weekIndex + 1, !attended)
-                                                        } // Обработчик клика
+                                                        } 
                                                         style={{
                                                             display: "flex",
                                                             flexDirection: "column",
                                                             alignItems: "center",
                                                             minWidth: "30px",
-                                                            cursor: "pointer", // Указываем, что элемент кликабельный
+                                                            cursor: "pointer", 
                                                         }}
                                                     >
-                                                        {/* Номер недели */}
                                                         <span
                                                             style={{
                                                                 fontSize: "16px",
@@ -512,7 +507,7 @@ const IoTPage = () => {
                     {weekIndex + 1}
                   </span>
 
-                                                        {/* Метка "U" или "N" */}
+                                                
                                                         <span
                                                             style={{
                                                                 fontSize: "24px",
@@ -527,7 +522,7 @@ const IoTPage = () => {
                                             })}
                                     </div>
 
-                                    {/* Кнопка настроек */}
+                                
                                     <div>
                                         <button
                                             onClick={() => setSelectedStudent(student)}
@@ -600,11 +595,11 @@ const IoTPage = () => {
                 onDelete={handleDeleteStudent}
                 onTogglePresence={async (id, present) => {
                     try {
-                        await updateStudentPresence(id, present); // Обновляем в базе данных
+                        await updateStudentPresence(id, present); 
                         const loadedStudents = await getStudents();
                         const formattedStudents = loadedStudents.map((student) => ({
                             id: student.id,
-                            name: `${student.first_name} ${student.last_name}`, // Объединяем имя и фамилию
+                            name: `${student.first_name} ${student.last_name}`, 
                             isic: student.isic,
                             present: student.present,
                             cviky_id: student.cviky_id,
@@ -612,7 +607,7 @@ const IoTPage = () => {
 
                         setStudents(formattedStudents);
                     } catch (error) {
-                        console.error("Ошибка обновления присутствия:", error.message);
+                        console.error("Error updating presence:", error.message);
                     }
                 }}
             />

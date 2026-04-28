@@ -15,9 +15,9 @@ import { findUserByLogin, verifyPassword } from './services/UserService.js';
 const app = express();
 app.use(express.json());
 const corsOptions = {
-    origin: 'http://localhost:5173', // Разрешить запросы с любых источников
-    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Разрешённые методы
-    allowedHeaders: ['Content-Type'], // Разрешённые заголовки
+    origin: 'http://localhost:5173', 
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], 
+    allowedHeaders: ['Content-Type'], 
 };
 app.options('/students/status/stream', cors({ origin: '*' }));
 app.use(cors(corsOptions));
@@ -26,27 +26,26 @@ app.use(bodyParser.json());
 const PORT = 3000;
 
 app.listen(PORT, () => {
-    console.log(`Сервер запущен на http://localhost:${PORT}`);
+    console.log(`Server is running on http://localhost:${PORT}`);
 });
 
 app.get('/', (req, res) => {
-    res.send('Сервер работает!');
+    res.send('Server is running!');
 });
 
-// Получить все пары
+
 app.get('/cviky', async (req, res) => {
-    console.log('Получен запрос на /cviky');
+    console.log('Gained response on /cviky');
     try {
         const pairs = await getPairs();
         res.status(200).json(pairs);
     } catch (err) {
-        console.error('Ошибка при получении пар:', err);
-        res.status(500).send('Ошибка сервера');
+        console.error('Error retrieving pairs:', err);
+        res.status(500).send('Error from server');
     }
 });
 
 
-// Добавить новую пару
 app.post('/cviky', async (req, res) => {
     const { day_name, time_start, time_end } = req.body;
     try {
@@ -54,11 +53,10 @@ app.post('/cviky', async (req, res) => {
         res.status(201).json(newPair);
     } catch (err) {
         console.error(err.message);
-        res.status(500).send('Ошибка сервера');
+        res.status(500).send('Error from server');
     }
 });
 
-// Обновить пару
 app.put('/cviky/:id', async (req, res) => {
     const { id } = req.params;
     const { day_name, time_start, time_end } = req.body;
@@ -67,35 +65,34 @@ app.put('/cviky/:id', async (req, res) => {
         res.status(200).json(updatedPair);
     } catch (err) {
         console.error(err.message);
-        res.status(500).send('Ошибка сервера');
+        res.status(500).send('Error from server');
     }
 });
 
-// Удалить пару
+
 app.delete('/cviky/:id', async (req, res) => {
     const { id } = req.params;
     try {
         await deletePair(id);
-        res.status(204).send(); // Успешное удаление
+        res.status(204).send(); 
     } catch (err) {
         console.error(err.message);
-        res.status(500).send('Ошибка сервера');
+        res.status(500).send('Error from server');
     }
 });
 
 
-// Получить всех студентов
+
 app.get('/students', async (req, res) => {
     try {
         const students = await getStudents();
         res.status(200).json(students);
     } catch (err) {
         console.error(err.message);
-        res.status(500).send('Ошибка сервера');
+        res.status(500).send('Error from server');
     }
 });
 
-// Добавить студента
 app.post("/students", async (req, res) => {
     const { isic, first_name, last_name, cviky_id } = req.body;
 
@@ -103,8 +100,8 @@ app.post("/students", async (req, res) => {
         const newStudent = await addStudent(isic, first_name, last_name, cviky_id);
         res.status(201).json(newStudent);
     } catch (error) {
-        console.error("Ошибка добавления студента:", error.message);
-        res.status(500).send("Ошибка сервера");
+        console.error("Error adding student:", error.message);
+        res.status(500).send("Error from server");
     }
 });
 
@@ -117,11 +114,11 @@ app.delete('/students/:id', async (req, res) => {
         res.status(204).send();
     } catch (err) {
         console.error(err.message);
-        res.status(500).send('Ошибка сервера');
+        res.status(500).send('Error from server');
     }
 });
 
-// Обновить присутствие студента
+
 app.put('/students/:id', async (req, res) => {
     const { id } = req.params;
     const { present } = req.body;
@@ -130,7 +127,7 @@ app.put('/students/:id', async (req, res) => {
         res.status(200).json(updatedStudent);
     } catch (err) {
         console.error(err.message);
-        res.status(500).send('Ошибка сервера');
+        res.status(500).send('Error from server');
     }
 });
 
@@ -141,8 +138,8 @@ app.delete("/students/cviky/:cvikyId", async (req, res) => {
         await deleteAllStudents(cvikyId);
         res.status(204).send(); // Успешно, без содержимого
     } catch (error) {
-        console.error("Ошибка удаления студентов:", error.message);
-        res.status(500).send("Ошибка сервера");
+        console.error("Error deleting students:", error.message);
+        res.status(500).send("Error from server");
     }
 });
 
@@ -153,19 +150,19 @@ app.post('/login', async (req, res) => {
         const user = await findUserByLogin(login);
 
         if (!user) {
-            return res.status(404).json({ message: 'Pouzivatel neexistuje' });
+            return res.status(404).json({ message: 'User does not exist' });
         }
 
         const isPasswordCorrect = await verifyPassword(password, user.password_hash);
 
         if (!isPasswordCorrect) {
-            return res.status(401).json({ message: 'Nespravne heslo' });
+            return res.status(401).json({ message: 'Incorrect password' });
         }
 
-        res.status(200).json({ message: 'Vitajte!', user: { login: user.login, role: user.role_server } });
+        res.status(200).json({ message: 'Welcome!', user: { login: user.login, role: user.role_server } });
     } catch (error) {
-        console.error('Nespravny login:', error.message);
-        res.status(500).json({ message: 'Chyba servera' });
+        console.error('Invalid login:', error.message);
+        res.status(500).json({ message: 'Server error' });
     }
 });
 
@@ -175,8 +172,8 @@ app.get('/students/cviky/:cvikyId', async (req, res) => {
         const students = await updatedStudents(cvikyId);
         res.status(200).json(students);
     } catch (error) {
-        console.error('Ошибка получения студентов для пары:', error.message);
-        res.status(500).send('Ошибка сервера');
+        console.error('Error fetching students for pair:', error.message);
+        res.status(500).send('Error from server');
     }
 });
 
@@ -188,8 +185,8 @@ app.get('/attendance/:studentId', async (req, res) => {
 
         res.status(200).json(attendance);
     } catch (error) {
-        console.error('Ошибка получения данных о посещаемости:', error.message);
-        res.status(500).send('Ошибка сервера');
+        console.error('Error fetching attendance data:', error.message);
+        res.status(500).send('Error from server');
     }
 });
 
@@ -199,8 +196,8 @@ app.put('/attendance', async (req, res) => {
         const updatedAttendance = await updateAttendance(studentIsic, weekNumber, attended);
         res.status(200).json(updatedAttendance);
     } catch (error) {
-        console.error('Ошибка обновления посещаемости:', error.message);
-        res.status(500).json({ error: 'Не удалось обновить данные о посещаемости.' });
+        console.error('Error updating attendance:', error.message);
+        res.status(500).json({ error: 'Failed to update attendance data.' });
     }
 });
 

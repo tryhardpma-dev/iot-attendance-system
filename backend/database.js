@@ -2,7 +2,7 @@ import pg from 'pg';
 
 const { Pool } = pg;
 
-// Настройки подключения
+
 const pool = new Pool({
     host: "localhost",
     port: 5432,
@@ -12,7 +12,6 @@ const pool = new Pool({
 });
 
 
-// Экспортируем объект для выполнения запросов
 export default {
-    query: (text, params) => pool.query(text, params), // Обертка для выполнения SQL-запросов
+    query: (text, params) => pool.query(text, params), 
 };

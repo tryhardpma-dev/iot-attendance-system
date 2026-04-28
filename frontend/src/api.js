@@ -2,19 +2,19 @@ import axios from 'axios';
 
 const API_URL = 'http://localhost:3000';
 
-// Получить пары
+
 export const getCviky = async () => {
     const response = await axios.get(`${API_URL}/cviky`);
     return response.data;
 };
 
-// Получить студентов
+
 export const getStudents = async () => {
     const response = await axios.get(`${API_URL}/students`);
     return response.data;
 };
 
-// Добавить студента
+
 export const addStudentToCviky = async ({ isic, first_name, last_name, cviky_id }) => {
     if (!first_name || !last_name) {
         throw new Error("Имя и фамилия обязательны для добавления студента.");
@@ -68,5 +68,5 @@ export const updateAttendance = async (studentIsic, weekNumber, attended) => {
         weekNumber,
         attended,
     });
-    return response.data; // Обновленные данные о посещаемости
+    return response.data; 
 };

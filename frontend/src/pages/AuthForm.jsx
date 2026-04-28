@@ -11,36 +11,35 @@ const AuthForm = ({setIsAuthenticated}) => {
         e.preventDefault();
 
         try {
-            // Запрашиваем данные пользователя с сервера
+           
             const data = await findByUserByLogin(username, password);
 
-            // Проверяем наличие данных о пользователе
             if (!data.user || !data.user.role) {
-                throw new Error("Неверные данные или отсутствует роль пользователя.");
+                throw new Error("Wrong credentials or missing user role.");
             }
             console.log('setIsAuthenticated:', typeof setIsAuthenticated);
 
-            console.log("Успешный вход:", data);
+            console.log("Successful login:", data);
 
-            localStorage.setItem("authToken", "dummy-token"); // Здесь должен быть реальный токен, если сервер его возвращает
-            console.log("Токен сохранен:", localStorage.getItem("authToken"));
+            localStorage.setItem("authToken", "dummy-token"); 
+            console.log("Token saved:", localStorage.getItem("authToken"));
 
-            // Устанавливаем флаг авторизации
+            // Set the authentication flag
             setIsAuthenticated(true);
 
-            // Перенаправляем в зависимости от роли пользователя
+            
             if (data.user.role === "teacher") {
                 console.log('Navigating to IoT');
                 window.location.href = '/iot';
 
-                console.log("Перенаправление на страницу IoT");
+                console.log("Navigating to IoT page");
             } else {
                 navigate("/");
-                console.log("Перенаправление на общую страницу");
+                console.log("Navigating to main page");
             }
         } catch (error) {
-            console.error("Ошибка входа:", error.message);
-            alert("Ошибка входа: " + error.message);
+            console.error("Login error:", error.message);
+            alert("Login error: " + error.message);
         }
     };
 

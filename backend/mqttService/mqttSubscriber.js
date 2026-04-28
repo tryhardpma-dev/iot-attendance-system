@@ -1,8 +1,6 @@
 import mqtt from 'mqtt';
 import pool from '../database.js';
 
-
-// Параметры подключения к MQTT-брокеру
 const mqttBrokerUrl = 'http://147.232.205.176/mqttexplorer/';
 const mqttOptions = {
     port: 1883,
@@ -10,29 +8,25 @@ const mqttOptions = {
     password: 'mother.mqtt.password',
 };
 
-
 const client = mqtt.connect(mqttBrokerUrl, mqttOptions);
-
-
 const topic = 'kpi/romulus/rfid/vl457mk';
 
 
 client.on('connect', () => {
-    console.log('Подключение к MQTT успешно установлено');
+    console.log('Connection to MQTT is successful');
 
-    // Подписка на топик
     client.subscribe(topic, (err) => {
         if (err) {
-            console.error('Ошибка подписки на топик:', err.message);
+            console.error('Error subscribing to topic:', err.message);
         } else {
-            console.log(`Подписка на топик "${topic}" выполнена`);
+            console.log(`Subscription to topic "${topic}" successful`);
         }
     });
 });
 
-// Обработка сообщений из подписанного топика
+
 client.on('message', async (topic, message) => {
-    console.log(`Сообщение из топика ${topic}: ${message.toString()}`);
+    console.log(`Message from topic ${topic}: ${message.toString()}`);
 
 });
 
@@ -40,16 +34,16 @@ client.on('message', async (topic, message) => {
 client.on('message', async (topic, message) => {
     try {
         const data = JSON.parse(message.toString());
-        console.log(`\n=== Новое сообщение из топика "${topic}" ===`);
-        console.log(`Полученные данные: ${JSON.stringify(data, null, 2)}`);
+        console.log(`\n=== New message from topic "${topic}" ===`);
+        console.log(`Received data: ${JSON.stringify(data, null, 2)}`);
 
         if (data.attendances && Array.isArray(data.attendances)) {
             for (const attendance of data.attendances) {
                 const { student_id, cviky_id, dt } = attendance;
-                console.log(`Обработка студента: ${student_id}, пара: ${cviky_id}, время: ${dt}`);
+                console.log(`Processing student: ${student_id}, pair: ${cviky_id}, time: ${dt}`);
 
-                // Лог перед выполнением SQL-запроса
-                console.log("Выполнение запроса для проверки пары...");
+                // Log before executing SQL query
+                console.log("Executing query to check pair...");
                 console.log(`SQL: SELECT * FROM cviky WHERE id = ${cviky_id} AND day_name = to_char('${dt}', 'Day') AND '${dt}'::time BETWEEN (time_start - interval '15 minutes') AND (time_start + interval '30 minutes');`);
 
                 // Проверка на правильность пары
@@ -65,11 +59,9 @@ client.on('message', async (topic, message) => {
                 const values = [cviky_id, dt];
                 const result = await pool.query(query, values);
 
-                // Лог результата SQL-запроса на проверку пары
                 if (result.rows.length > 0) {
-                    console.log(`✅ Студент ${student_id} пришел на правильную пару ${cviky_id}.`);
+                    console.log(`Student ${student_id} arrived at the correct pair ${cviky_id}.`);
 
-                    // Обновляем присутствие в таблице studenty
                     const updateQuery = `
                         UPDATE studenty
                         SET present = true, timestamp = $1
@@ -80,10 +72,10 @@ client.on('message', async (topic, message) => {
                     const updateResult = await pool.query(updateQuery, updateValues);
 
                     if (updateResult.rowCount > 0) {
-                        console.log(`✅ Присутствие обновлено: ${JSON.stringify(updateResult.rows[0], null, 2)}`);
+                        console.log(`Presence updated: ${JSON.stringify(updateResult.rows[0], null, 2)}`);
 
 
-                        const semesterStartDate = new Date('2025-01-03T00:00:00Z'); // Дата начала семестра
+                        const semesterStartDate = new Date('2025-01-03T00:00:00Z'); 
 
                         const currentWeek = Math.ceil(
                             (new Date(dt).getTime() - semesterStartDate.getTime()) / (1000 * 60 * 60 * 24 * 7)
@@ -101,32 +93,29 @@ client.on('message', async (topic, message) => {
                         const attendanceResult = await pool.query(attendanceUpdateQuery, attendanceValues);
 
                         if (attendanceResult.rowCount > 0) {
-                            console.log(`Неделя ${currentWeek} отмечена как посещенная для студента ${student_id}.`);
+                            console.log(`Week ${currentWeek} marked as attended for student ${student_id}.`);
                         } else {
-                            console.warn(`⚠️ Не удалось обновить данные посещаемости для недели ${currentWeek}.`);
+                            console.warn(`Failed to update attendance data for week ${currentWeek}.`);
                         }
                     } else {
-                        console.warn(`⚠️ Студент ${student_id} не найден в таблице "studenty".`);
+                        console.warn(`Student ${student_id} not found in table "studenty".`);
                     }
                 } else {
-                    console.warn(`❌ Студент ${student_id} пришел на неправильную пару или в неподходящее время.`);
+                    console.warn(`Student ${student_id} arrived at the wrong pair or at the wrong time.`);
                 }
             }
         } else {
-            console.warn('⚠️ Неправильный формат данных. Поле "attendances" отсутствует или не является массивом.');
+            console.warn('Invalid data format. Field "attendances" is missing or not an array.');
         }
     } catch (error) {
-        console.error('❌ Ошибка обработки сообщения:', error.message);
-        console.error(error.stack); // Вывод полного стека ошибки для отладки
+        console.error('Error processing message:', error.message);
+        console.error(error.stack); 
     }
 });
 
 
-
-
-// Обработка ошибок
 client.on('error', (err) => {
-    console.error('Ошибка подключения к MQTT:', err.message);
+    console.error('Error connecting to MQTT:', err.message);
 });
 
 
