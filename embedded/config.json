@@ -1,0 +1,1 @@
+{"wifi": {"ssid": "romulus-things", "key": "welcome.to.the.romulus"}, "SLEEP_DURATION": 10, "TEST": 15, "ACCEPT_TIME": 20, "mqtt": {"server": "10.42.0.1", "user": "maker", "port": 1883, "client_id": "ne_pridumali", "password": "this.is.mqtt"}, "ntpHost": "pool.ntp.org"}
