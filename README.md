@@ -23,7 +23,7 @@ This project bridges the gap between physical hardware and cloud-based data mana
 - **Secure API:** Express.js backend managing data flow and hardware-to-server communication.
 
 ## 🛠 Tech Stack
-- **Hardware:** Raspberry Pi Pico (MicroPython/C++), RC522 RFID Module.
+- **Hardware:** Raspberry Pi Pico (MicroPython), RC522 RFID Module.
 - **Frontend:** React.js, CSS3 (Responsive Design).
 - **Backend:** Node.js, Express.js.
 - **Database:** PostgreSQL.
@@ -34,11 +34,5 @@ This project bridges the gap between physical hardware and cloud-based data mana
 2. **Transport Level:** The hardware sends a POST request with the UID to the Express.js server.
 3. **Server Level:** The API validates the student in the PostgreSQL database and logs the timestamp.
 
-
-## 🔧 Installation & Setup
-
-### Hardware Setup
-1. Connect the RC522 to the Raspberry Pi Pico via SPI pins.
-2. Flash the firmware located in the `/firmware` directory.
 
 >>>>>>> b65676fb3639279efc171bd340dbe2fbbeb295aa
